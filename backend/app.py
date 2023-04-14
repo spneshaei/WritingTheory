@@ -85,25 +85,25 @@ def get_new_example_idea():
     username = request.json['username']
     text = request.json['text']
     currentPage = request.json['currentPage']
-    print("got request from '" + username + "' with text: " + text)
+    print("got request from '" + username + "' current page '" + currentPage + "' with text: " + text)
     lock.acquire()
     try:
         ideas_data = load_data_from_file("ideas")
         for user in ideas_data:
-            if user.username == username:
+            if user.username == username and user.currentPage == currentPage:
                 messages = createGPTMessagesArray(user.ideas, currentPage, text)
                 new_idea = getNewIdeaFromGPT(messages)
                 user.ideas.append(new_idea)
                 save_data_to_file("ideas", ideas_data)
                 each_idea_data = load_data_from_file("each_idea")
-                each_idea_data.append({"username": username, "text": text, "idea": new_idea, "time": int(time.time())})
+                each_idea_data.append({"username": username, "text": text, "idea": new_idea, "currentPage": currentPage, "time": int(time.time())})
                 save_data_to_file("each_idea", each_idea_data)
                 lock.release()
                 return jsonify({"success": True, "idea": new_idea})
         initials = initialMessages if currentPage == "study" else initialMessages_evaluation
         messages = createGPTMessagesArray(initials, currentPage, text)
         new_idea = getNewIdeaFromGPT(messages)
-        ideas_data.append({"username": username, "ideas": initials + [new_idea]})
+        ideas_data.append({"username": username, "ideas": initials + [new_idea], "currentPage": currentPage})
         save_data_to_file("ideas", ideas_data)
         each_idea_data = load_data_from_file("each_idea")
         each_idea_data.append({"username": username, "text": text, "idea": new_idea, "currentPage": currentPage, "time": int(time.time())})
@@ -144,13 +144,14 @@ def submit():
         print(e)
         save_error_log("submit-keystrokes")
 
-    try:
-        helpTaps_data = load_data_from_file("helpTaps")
-        helpTaps_data.append({"username": username, "helpTaps": helpTaps, "time": int(time.time()), "currentPage": currentPage})
-        save_data_to_file("helpTaps", helpTaps_data)
-    except Exception as e:
-        print(e)
-        save_error_log("submit-helpTaps")
+    if len(helpTaps) > 0:
+        try:
+            helpTaps_data = load_data_from_file("helpTaps")
+            helpTaps_data.append({"username": username, "helpTaps": helpTaps, "time": int(time.time()), "currentPage": currentPage})
+            save_data_to_file("helpTaps", helpTaps_data)
+        except Exception as e:
+            print(e)
+            save_error_log("submit-helpTaps")
 
     lock.release()
     return jsonify({"success": True})
