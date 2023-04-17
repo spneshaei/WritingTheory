@@ -52,7 +52,11 @@ initialMessages = [
     "Feedback improves critical thinking skills and leads to better decision-making"
 ]
 
-initialMessages_evaluation = []
+initialMessages_evaluation = [
+    "Avoid using informal language such as \"you guys\" in academic or professional writing.",
+    "Avoid repetition, as there is here with defensiveness; instead consolidate similar points for greater clarity and conciseness.",
+    "Include specific examples or anecdotes to highlight the importance of accepting feedback from professors, making your statement more relatable and impactful."
+]
 
 
 def createGPTMessagesArray(currentIdeas, currentPage, currentText):
@@ -74,7 +78,8 @@ def getNewIdeaFromGPT(messages):
     print("Getting from GPT:" + str(messages))
     msg = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=messages
+        messages=messages,
+        temperature=0,
     )
     new_idea = msg['choices'][0]['message']['content']
     print("Got from GPT:" + str(new_idea))
