@@ -63,10 +63,11 @@ def createGPTMessagesArray(currentIdeas, currentPage, currentText):
     cleanedText = currentText.replace('"', "'")
     messages = []
     if currentPage == "study":
-        messages = [{"role": "system", "content": "You provide one example idea per response. Give only the idea without any preamble or comment. Be as brief as possible."}, {"role": "user", "content": "Give me an example idea that convinces a bright but stubborn 20-year old male student that was asked by his professor whether he wants feedback on his latest term paper to agree to receive the feedback."}]
+        messages = [{"role": "system", "content": "You provide one example idea per response. Give only the idea without any preamble or comment. Be as brief as possible."}, {"role": "user", "content": "I need an example idea to include in a message. The message should convince my study group partners to seek feedback from our professor before submitting your assignment."}]
         for idea in currentIdeas:
             messages.append({"role": "assistant", "content": idea})
             messages.append({"role": "user", "content": "Do the same but with a new idea."})
+        messages.append({"role": "system", "content": "The new idea should add to this message: \"" + cleanedText + "\""})
     elif currentPage == "evaluation":
         messages = [{"role": "system", "content": "You evaluate text and give one suggestion for improvement. Give only the suggestion without any preamble or comment. Be as brief as possible."}, {"role": "user", "content": "This is my message: \"" + cleanedText + "\""}]
         for idea in currentIdeas:
